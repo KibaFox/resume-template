@@ -1,0 +1,44 @@
+@media print {
+    p {
+        page-break-inside: avoid;
+    }
+
+    blockquote {
+        page-break-inside: auto;
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
+    }
+}
+
+body {
+    font-family: 'libre baskerville', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'libre baskerville', serif;
+}
+
+h2 {
+    text-align: center;
+}
+
+ul, ol {
+    padding-left: 1.5rem;
+}
+
+blockquote, blockquote p {
+    color: inherit;
+}
+
+#skill-summary ~ blockquote {
+    border-left-color: transparent;
+}
+
+#professional-experience ~ blockquote {
+    border-left-color: #cacaca;
+}
+
+#education ~ blockquote {
+    border-left-color: transparent;
+}

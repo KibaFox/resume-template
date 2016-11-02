@@ -6,9 +6,11 @@ PDFOUT        = $(BUILDDIR)/resume.pdf
 .PHONY: help clean html pdf serve
 
 help:
-	@echo "Please use \`make <target>' where <target> is one of"
+	@echo "Please use \`make <target>\` where <target> is one of"
+	@echo "  clean      to clean the build directory"
 	@echo "  html       to make standalone HTML files"
 	@echo "  serve      to run a simple http server to view the HTML version"
+	@echo "  pdf        to use wkhtmltopdf to produce a PDF version"
 
 clean:
 	rm -rf $(BUILDDIR)/*

@@ -9,6 +9,10 @@
     border-right: none;
     border-bottom: none;
   }
+
+  .page-break {
+    page-break-before: always;
+  }
 }
 
 body {

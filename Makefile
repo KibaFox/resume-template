@@ -1,9 +1,10 @@
 SOURCE        = resume.md
 BUILDDIR      = build
-HTMLOUT       = $(BUILDDIR)/resume.html
-PDFOUT        = $(BUILDDIR)/resume.pdf
+NAME          = resume
+HTMLOUT       = $(BUILDDIR)/$(NAME).html
+PDFOUT        = $(BUILDDIR)/$(NAME).pdf
 
-.PHONY: help clean html pdf serve
+.PHONY: help clean html pdf serve package
 
 help:
 	@echo "Please use \`make <target>\` where <target> is one of"
@@ -11,6 +12,7 @@ help:
 	@echo "  html       to make standalone HTML files"
 	@echo "  serve      to run a simple http server to view the HTML version"
 	@echo "  pdf        to use wkhtmltopdf to produce a PDF version"
+	@echo "  package    to create a compressed package of the resume"
 
 clean:
 	rm -rf $(BUILDDIR)/*
@@ -32,3 +34,6 @@ pdf: html
 
 serve: html
 	(cd $(BUILDDIR); python3 -m http.server)
+
+package: pdf
+	tar --transform 's/$(BUILDDIR)/$(NAME)/' -c --xz -f $(NAME).tar.xz $(BUILDDIR)

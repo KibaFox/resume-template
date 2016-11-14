@@ -64,6 +64,7 @@ Please use `make <target>` where <target> is one of
   html       to make standalone HTML files
   serve      to run a simple http server to view the HTML version
   pdf        to use wkhtmltopdf to produce a PDF version
+  package    to create a compressed package of the resume
 ```
 
 The help text provides a list of targets available and brief descriptions of

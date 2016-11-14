@@ -8,7 +8,7 @@ PDFOUT        = $(BUILDDIR)/$(NAME).pdf
 
 help:
 	@echo "Please use \`make <target>\` where <target> is one of"
-	@echo "  clean      to clean the build directory"
+	@echo "  clean      to clean the build directory and any built packages"
 	@echo "  html       to make standalone HTML files"
 	@echo "  serve      to run a simple http server to view the HTML version"
 	@echo "  pdf        to use wkhtmltopdf to produce a PDF version"
@@ -16,6 +16,7 @@ help:
 
 clean:
 	rm -rf $(BUILDDIR)/*
+	rm *.tar.xz
 
 html:
 	mkdir -p $(BUILDDIR)

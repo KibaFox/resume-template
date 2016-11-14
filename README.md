@@ -60,7 +60,7 @@ From the root of the project directory (in this directory, the project root is
 ```sh
 [~/proj/resume-template]$ make
 Please use `make <target>` where <target> is one of
-  clean      to clean the build directory
+  clean      to clean the build directory and any built packages
   html       to make standalone HTML files
   serve      to run a simple http server to view the HTML version
   pdf        to use wkhtmltopdf to produce a PDF version

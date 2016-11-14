@@ -28,7 +28,7 @@ html:
 		-s $(SOURCE) -o $(HTMLOUT)
 
 pdf: html
-	wkhtmltopdf $(HTMLOUT) $(PDFOUT)
+	wkhtmltopdf --page-size 'Letter' --print-media-type $(HTMLOUT) $(PDFOUT)
 
 serve: html
 	(cd $(BUILDDIR); python3 -m http.server)

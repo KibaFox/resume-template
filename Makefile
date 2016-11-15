@@ -16,7 +16,7 @@ help:
 
 clean:
 	rm -rf $(BUILDDIR)/*
-	rm *.tar.xz
+	rm -f *.tar.xz
 
 html:
 	mkdir -p $(BUILDDIR)

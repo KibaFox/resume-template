@@ -1,40 +1,81 @@
-SOURCE        = resume.md
-BUILDDIR      = build
-NAME          = resume
-HTMLOUT       = $(BUILDDIR)/$(NAME).html
-PDFOUT        = $(BUILDDIR)/$(NAME).pdf
+# Environment Variable Defaults
+NAME       ?= jane-smith-resume
+SOURCE     ?= resume.adoc
+OUTDIR     ?= dist
+PAGE_SIZE  ?= A4
+USE_DOCKER ?= true
+
+# Utility
+pkgout     := $(OUTDIR)/$(NAME).html.tar.xz
+pdfout     := $(OUTDIR)/$(NAME).pdf
+htmldir    := $(OUTDIR)/html
+htmlout    := $(htmldir)/$(NAME).html
+# htmldiresc is htmldir but with backslash escape on '/'
+htmldiresc := $(subst /,\/,$(htmldir))
+
+# Docker (if USE_DOCKER is "true")
+asciidoctor_img = asciidoctor/docker-asciidoctor
+ensure_ascidoctor_img = $(if $(shell docker images -q $(asciidoctor_img)),, \
+	docker pull $(asciidoctor_img);)
+
+ifeq ($(USE_DOCKER),true)
+docker = $(ensure_ascidoctor_img) \
+	docker run --rm \
+		--name 'asciidoctor-resume' \
+		-u $(shell id -u):$(shell id -g) \
+		-v $(shell pwd):/documents/ \
+		$(asciidoctor_img)
+endif
 
 .PHONY: help clean html pdf serve package
 
 help:
-	@echo "Please use \`make <target>\` where <target> is one of"
-	@echo "  clean      to clean the build directory and any built packages"
-	@echo "  html       to make standalone HTML files"
-	@echo "  serve      to run a simple http server to view the HTML version"
-	@echo "  pdf        to use wkhtmltopdf to produce a PDF version"
-	@echo "  package    to create a compressed package of the resume"
+	@echo 'Resume/CV - Turn text into professional PDF or HTML resume/CV'
+	@echo ''
+	@echo 'Usage: make <action>'
+	@echo ''
+	@echo 'Actions:'
+	@echo '  clean      to clean the build directory and any built packages'
+	@echo '  html       to make standalone HTML files'
+	@echo '  pdf        to use wkhtmltopdf to produce a PDF version'
+	@echo '  package    to create a compressed package of the HTML resume'
+	@echo ''
+	@echo 'Environment variables'
+	@echo '  NAME       the filename (without extension) of the output'
+	@echo '             (currently: $(NAME))'
+	@echo '  SOURCE     the source file to use as input'
+	@echo '             (currently: $(SOURCE))'
+	@echo '  OUTDIR     the directory where the generated files will be placed'
+	@echo '             (currently: $(OUTDIR))'
+	@echo '  PAGE_SIZE  the page size for the PDF (example: Letter)'
+	@echo '             (currently: $(PAGE_SIZE))'
+	@echo '  USE_DOCKER if set to "true", will use docker to run generator'
+	@echo '             (currently: $(USE_DOCKER))'
+	@echo ''
+	@echo 'Example:'
+	@echo '  $$ export USE_DOCKER=true'
+	@echo '  $$ make pdf'
 
 clean:
-	rm -rf $(BUILDDIR)/*
+	rm -rf $(OUTDIR)
 	rm -f *.tar.xz
 
-html:
-	mkdir -p $(BUILDDIR)
-	rsync -q -r --delete css $(BUILDDIR)
-	rsync -q -r --delete img $(BUILDDIR)
-	pandoc -t html5 \
-		-c https://cdn.jsdelivr.net/foundation/6.2.4/foundation.min.css \
-		-c https://fonts.googleapis.com/css?family=Libre+Baskerville \
-		-c css/resume.css \
-		-B partials/before-body.html \
-		-A partials/after-body.html \
-		-s $(SOURCE) -o $(HTMLOUT)
+$(htmldir)/img: img
+	mkdir -p $(htmldir)/img
+	cp -r img $(htmldir)
+	touch $(htmldir)/img
 
-pdf: html
-	wkhtmltopdf --page-size 'Letter' --print-media-type $(HTMLOUT) $(PDFOUT)
+html: $(htmldir)/img
+	$(docker) asciidoctor \
+		-a nofooter \
+		-o $(htmlout) \
+		$(SOURCE)
 
-serve: html
-	(cd $(BUILDDIR); python3 -m http.server)
+pdf:
+	$(docker) asciidoctor-pdf -s \
+		-a pdf-page-size=$(PAGE_SIZE) \
+		-o $(pdfout) \
+		$(SOURCE)
 
-package: pdf
-	tar --transform 's/$(BUILDDIR)/$(NAME)/' -c --xz -f $(NAME).tar.xz $(BUILDDIR)
+package: html
+	tar --transform 's/$(htmldiresc)/$(NAME)/' -c --xz -f $(pkgout) $(htmldir)

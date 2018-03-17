@@ -37,10 +37,9 @@ From the root of the project directory (in this example, the project root is
     Usage: make <action>
 
     Actions:
-      clean      to clean the build directory and any built packages
-      html       to make standalone HTML files
-      pdf        to use wkhtmltopdf to produce a PDF version
-      package    to create a compressed package of the HTML resume
+      clean      to remove the output directory
+      html       to make a standalone HTML version of the resume
+      pdf        to produce a PDF version of the resume
 
     Environment variables
       NAME       the filename (without extension) of the output
@@ -49,12 +48,15 @@ From the root of the project directory (in this example, the project root is
                  (currently: resume.adoc)
       OUTDIR     the directory where the generated files will be placed
                  (currently: dist)
+      PAGE_SIZE  the page size for the PDF (example: Letter)
+                 (currently: A4)
       USE_DOCKER if set to "true", will use docker to run generator
                  (currently: true)
 
     Example:
       $ export USE_DOCKER=true
       $ make pdf
+        Resume/CV - Turn text into professional PDF or HTML resume/CV
 
 The help text provides a list of actions available and brief descriptions of
 each.
@@ -63,7 +65,7 @@ To generate the HTML version of the resume, run the following:
 
     [~/proj/resume-template]$ make html
 
-This will create the `dist/html` directory in the root of the project if it
+This will create the `dist/` directory in the root of the project if it
 doesn't exist already and `jane-smith-resume.html` will be produced inside. You
 can view the resume by opening this file with your browser.
 

@@ -6,12 +6,9 @@ PAGE_SIZE  ?= A4
 USE_DOCKER ?= true
 
 # Utility
-pkgout     := $(OUTDIR)/$(NAME).html.tar.xz
 pdfout     := $(OUTDIR)/$(NAME).pdf
-htmldir    := $(OUTDIR)/html
-htmlout    := $(htmldir)/$(NAME).html
-# htmldiresc is htmldir but with backslash escape on '/'
-htmldiresc := $(subst /,\/,$(htmldir))
+htmlout    := $(OUTDIR)/$(NAME).html
+pkgout     := $(OUTDIR)/$(NAME).html.tar.gz
 
 # Docker (if USE_DOCKER is "true")
 asciidoctor_img = asciidoctor/docker-asciidoctor
@@ -35,10 +32,9 @@ help:
 	@echo 'Usage: make <action>'
 	@echo ''
 	@echo 'Actions:'
-	@echo '  clean      to clean the build directory and any built packages'
-	@echo '  html       to make standalone HTML files'
-	@echo '  pdf        to use wkhtmltopdf to produce a PDF version'
-	@echo '  package    to create a compressed package of the HTML resume'
+	@echo '  clean      to remove the output directory'
+	@echo '  html       to make a standalone HTML version of the resume'
+	@echo '  pdf        to produce a PDF version of the resume'
 	@echo ''
 	@echo 'Environment variables'
 	@echo '  NAME       the filename (without extension) of the output'
@@ -58,15 +54,10 @@ help:
 
 clean:
 	rm -rf $(OUTDIR)
-	rm -f *.tar.xz
 
-$(htmldir)/img: img
-	mkdir -p $(htmldir)/img
-	cp -r img $(htmldir)
-	touch $(htmldir)/img
-
-html: $(htmldir)/img
+html:
 	$(docker) asciidoctor \
+		-a data-uri \
 		-a nofooter \
 		-o $(htmlout) \
 		$(SOURCE)
@@ -76,6 +67,3 @@ pdf:
 		-a pdf-page-size=$(PAGE_SIZE) \
 		-o $(pdfout) \
 		$(SOURCE)
-
-package: html
-	tar --transform 's/$(htmldiresc)/$(NAME)/' -c --xz -f $(pkgout) $(htmldir)
